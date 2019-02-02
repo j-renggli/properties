@@ -18,7 +18,7 @@ template <class T>
 void testBasicPropertyConstructor(const typename T::value_type& value)
 {
     INFO("BasicProperty constructor");
-    T prop(value, "name", "display");
+    T prop("name", value, "display");
     checkBasicProperty(prop, value);
 }
 
@@ -26,7 +26,7 @@ template <class T>
 void testBasicPropertyCopyConstructor(const typename T::value_type& value)
 {
     INFO("BasicProperty copy-constructor");
-    T original(value, "name", "display");
+    T original("name", value, "display");
     T prop(original);
     checkBasicProperty(prop, value);
 }
@@ -35,8 +35,8 @@ template <class T>
 void testBasicPropertyCopyOperator(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty copy-operator");
-    T original(value, "name", "display");
-    T prop(other, "name", "display");
+    T original("name", value, "display");
+    T prop("name", other, "display");
     prop = original;
     checkBasicProperty(prop, value);
 }
@@ -45,7 +45,7 @@ template <class T>
 void testBasicPropertyClone(const typename T::value_type& value)
 {
     INFO("BasicProperty clone");
-    T original(value, "name", "display");
+    T original("name", value, "display");
     auto prop = original.clone();
     checkBasicProperty(prop->template cast<T>(), value);
 }
@@ -54,7 +54,7 @@ template <class T>
 void testBasicPropertyConvert(const typename T::value_type& value)
 {
     INFO("BasicProperty convert");
-    T original(value, "name", "display");
+    T original("name", value, "display");
     auto prop = T::convert(original);
     checkBasicProperty(*prop, value);
 }
@@ -63,7 +63,7 @@ template <class T>
 void testBasicPropertyAssignment(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty constructor");
-    T prop(value, "name", "display");
+    T prop("name", value, "display");
     prop = other;
     checkBasicProperty(prop, other);
 }
@@ -73,7 +73,7 @@ void testBasicPropertyCopyConstructedAssignment(const typename T::value_type& va
                                                 const typename T::value_type& other)
 {
     INFO("BasicProperty copy-constructor is independent from its base");
-    T original(value, "name", "display");
+    T original("name", value, "display");
     T prop(original);
     prop = other;
     checkBasicProperty(original, value);
@@ -84,8 +84,8 @@ template <class T>
 void testBasicPropertyCopyOperatedAssignment(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty copy-operator is independent from its base");
-    T original(value, "name", "display");
-    T prop(other, "name", "display");
+    T original("name", value, "display");
+    T prop("name", other, "display");
     prop = original;
     checkBasicProperty(prop, value);
     prop = other;
@@ -97,7 +97,7 @@ template <class T>
 void testBasicPropertyClonedAssignment(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty clone is independent from its base");
-    T original(value, "name", "display");
+    T original("name", value, "display");
     auto clone = original.clone();
     T& prop = clone->template cast<T>();
     prop = other;
@@ -109,7 +109,7 @@ template <class T>
 void testBasicPropertyConvertedAssignment(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty convert is independent from its base");
-    T original(value, "name", "display");
+    T original("name", value, "display");
     auto prop = T::convert(original);
     *prop = other;
     checkBasicProperty(original, value);
@@ -120,8 +120,8 @@ template <class T>
 void testBasicPropertyEquality(const typename T::value_type& value)
 {
     INFO("BasicProperty equals another of same name and value");
-    T left(value, "name", "display");
-    T right(value, "name", "display2");
+    T left("name", value, "display");
+    T right("name", value, "display2");
     CHECK(left == left);
     CHECK(left == right);
 }
@@ -130,9 +130,9 @@ template <class T>
 void testBasicPropertyUnequality(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty is not equal to another of differnt name or value");
-    T base(value, "name", "display");
-    T name(value, "name2", "display");
-    T val(other, "name", "display");
+    T base("name", value, "display");
+    T name("name2", value, "display");
+    T val("name", other, "display");
     CHECK(base != name);
     CHECK(base != val);
 }
@@ -166,7 +166,7 @@ void testBasicProperty(const typename T::value_type& base, const typename T::val
 
     {
         INFO("To string");
-        T prop(base, "a_name", "Display");
+        T prop("a_name", base, "Display");
         std::stringstream ss;
         ss << "Display=" << T::identifier << "[";
         stream::convert(ss, base) << "]";
@@ -178,10 +178,6 @@ void testBasicProperty(const typename T::value_type& base, const typename T::val
         CHECK(static_cast<std::wstring>(prop) == wss.str());
     }
 }
-
-template <class T, class... Params>
-struct GroupPropertyTester {
-};
 
 TEST_CASE("Test BooleanProperty")
 {

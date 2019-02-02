@@ -2,6 +2,7 @@ set(src
     main.cpp
 
     basic_properties.cpp
+    numeric_properties.cpp
 )
 
 add_executable(test_properties ${src})
