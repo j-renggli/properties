@@ -6,7 +6,7 @@ namespace property
 {
 
 template <class T>
-void checkBaseProperty(const T& prop, const typename T::value_type& value)
+void checkBasicProperty(const T& prop, const typename T::value_type& value)
 {
     CHECK(prop.value() == value);
     CHECK(prop.name() == "name");
@@ -15,58 +15,168 @@ void checkBaseProperty(const T& prop, const typename T::value_type& value)
 }
 
 template <class T>
-void testBasePropertyConstructor(const typename T::value_type& value)
+void testBasicPropertyConstructor(const typename T::value_type& value)
 {
-    INFO("BaseProperty constructor");
+    INFO("BasicProperty constructor");
     T prop(value, "name", "display");
-    checkBaseProperty(prop, value);
+    checkBasicProperty(prop, value);
 }
 
 template <class T>
-void testBasePropertyCopyConstructor(const typename T::value_type& value)
+void testBasicPropertyCopyConstructor(const typename T::value_type& value)
 {
-    INFO("BaseProperty copy-constructor");
+    INFO("BasicProperty copy-constructor");
     T original(value, "name", "display");
     T prop(original);
-    checkBaseProperty(prop, value);
+    checkBasicProperty(prop, value);
 }
 
 template <class T>
-void testBasePropertyCopyOperator(const typename T::value_type& value, const typename T::value_type& other)
+void testBasicPropertyCopyOperator(const typename T::value_type& value, const typename T::value_type& other)
 {
-    INFO("BaseProperty copy-operator");
+    INFO("BasicProperty copy-operator");
     T original(value, "name", "display");
     T prop(other, "name", "display");
     prop = original;
-    checkBaseProperty(prop, value);
+    checkBasicProperty(prop, value);
 }
 
 template <class T>
-void testBasePropertyClone(const typename T::value_type& value)
+void testBasicPropertyClone(const typename T::value_type& value)
 {
-    INFO("BaseProperty clone");
+    INFO("BasicProperty clone");
     T original(value, "name", "display");
     auto prop = original.clone();
-    checkBaseProperty(prop->template cast<T>(), value);
+    checkBasicProperty(prop->template cast<T>(), value);
 }
 
 template <class T>
-void testBasePropertyConvert(const typename T::value_type& value)
+void testBasicPropertyConvert(const typename T::value_type& value)
 {
-    INFO("BaseProperty convert");
+    INFO("BasicProperty convert");
     T original(value, "name", "display");
     auto prop = T::convert(original);
-    checkBaseProperty(*prop, value);
+    checkBasicProperty(*prop, value);
 }
 
 template <class T>
-void testBaseProperty(const typename T::value_type& base, const typename T::value_type& other)
+void testBasicPropertyAssignment(const typename T::value_type& value, const typename T::value_type& other)
 {
-    testBasePropertyConstructor<T>(base);
-    testBasePropertyCopyConstructor<T>(base);
-    testBasePropertyCopyOperator<T>(base, other);
-    testBasePropertyClone<T>(base);
-    testBasePropertyConvert<T>(base);
+    INFO("BasicProperty constructor");
+    T prop(value, "name", "display");
+    prop = other;
+    checkBasicProperty(prop, other);
+}
+
+template <class T>
+void testBasicPropertyCopyConstructedAssignment(const typename T::value_type& value,
+                                                const typename T::value_type& other)
+{
+    INFO("BasicProperty copy-constructor is independent from its base");
+    T original(value, "name", "display");
+    T prop(original);
+    prop = other;
+    checkBasicProperty(original, value);
+    checkBasicProperty(prop, other);
+}
+
+template <class T>
+void testBasicPropertyCopyOperatedAssignment(const typename T::value_type& value, const typename T::value_type& other)
+{
+    INFO("BasicProperty copy-operator is independent from its base");
+    T original(value, "name", "display");
+    T prop(other, "name", "display");
+    prop = original;
+    checkBasicProperty(prop, value);
+    prop = other;
+    checkBasicProperty(original, value);
+    checkBasicProperty(prop, other);
+}
+
+template <class T>
+void testBasicPropertyClonedAssignment(const typename T::value_type& value, const typename T::value_type& other)
+{
+    INFO("BasicProperty clone is independent from its base");
+    T original(value, "name", "display");
+    auto clone = original.clone();
+    T& prop = clone->template cast<T>();
+    prop = other;
+    checkBasicProperty(original, value);
+    checkBasicProperty(prop, other);
+}
+
+template <class T>
+void testBasicPropertyConvertedAssignment(const typename T::value_type& value, const typename T::value_type& other)
+{
+    INFO("BasicProperty convert is independent from its base");
+    T original(value, "name", "display");
+    auto prop = T::convert(original);
+    *prop = other;
+    checkBasicProperty(original, value);
+    checkBasicProperty(*prop, other);
+}
+
+template <class T>
+void testBasicPropertyEquality(const typename T::value_type& value)
+{
+    INFO("BasicProperty equals another of same name and value");
+    T left(value, "name", "display");
+    T right(value, "name", "display2");
+    CHECK(left == left);
+    CHECK(left == right);
+}
+
+template <class T>
+void testBasicPropertyUnequality(const typename T::value_type& value, const typename T::value_type& other)
+{
+    INFO("BasicProperty is not equal to another of differnt name or value");
+    T base(value, "name", "display");
+    T name(value, "name2", "display");
+    T val(other, "name", "display");
+    CHECK(base != name);
+    CHECK(base != val);
+}
+
+template <class T>
+void testBasicProperty(const typename T::value_type& base, const typename T::value_type& other)
+{
+    {
+        INFO("Constructors and related");
+        testBasicPropertyConstructor<T>(base);
+        testBasicPropertyCopyConstructor<T>(base);
+        testBasicPropertyCopyOperator<T>(base, other);
+        testBasicPropertyClone<T>(base);
+        testBasicPropertyConvert<T>(base);
+    }
+
+    {
+        INFO("Set value modifies only target object");
+        testBasicPropertyAssignment<T>(base, other);
+        testBasicPropertyCopyConstructedAssignment<T>(base, other);
+        testBasicPropertyCopyOperatedAssignment<T>(base, other);
+        testBasicPropertyClonedAssignment<T>(base, other);
+        testBasicPropertyConvertedAssignment<T>(base, other);
+    }
+
+    {
+        INFO("Equality of basic properties");
+        testBasicPropertyEquality<T>(base);
+        testBasicPropertyUnequality<T>(base, other);
+    }
+
+    {
+        INFO("To string");
+        T prop(base, "a_name", "Display");
+        std::stringstream ss;
+        ss << "Display=" << T::identifier << "[";
+        stream::convert(ss, base) << "]";
+        std::wstringstream wss;
+        wss << L"Display=";
+        stream::convert(wss, T::identifier) << L"[";
+        stream::convert(wss, base) << L"]";
+        CHECK(static_cast<std::string>(prop) == ss.str());
+        CHECK(static_cast<std::wstring>(prop) == wss.str());
+    }
 }
 
 template <class T, class... Params>
@@ -75,11 +185,16 @@ struct GroupPropertyTester {
 
 TEST_CASE("Test BooleanProperty")
 {
-    testBaseProperty<BooleanProperty>(true, false);
+    testBasicProperty<BooleanProperty>(true, false);
+}
+
+TEST_CASE("Test StringProperty")
+{
+    testBasicProperty<StringProperty>("Asdf", "Qwer");
 }
 
 TEST_CASE("Test WStringProperty")
 {
-    testBaseProperty<WStringProperty>(L"Asdf", L"Qwer");
+    testBasicProperty<WStringProperty>(L"Asdf", L"Qwer");
 }
 }

@@ -24,13 +24,16 @@ add_compile_options(-Wall
 include_directories(${CMAKE_SOURCE_DIR})
 
 set(src
+    property.cpp
     property.h
-
     basic_property.cpp
     basic_property.h
 )
 
 add_library(properties ${src})
+
+generate_export_header(properties)
+target_include_directories(properties PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(properties
     )
