@@ -34,6 +34,13 @@ public:
     {
     }
 
+    NumericProperty& operator=(const NumericProperty& rhs)
+    {
+        value_ = rhs.value_;
+        min_ = rhs.min_;
+        max_ = rhs.max_;
+        return *this;
+    }
 
     static const std::string identifier;
     const std::string& id() const override { return identifier; }
@@ -45,6 +52,12 @@ public:
     const value_type& max() const { return max_; }
     value_type& max() { return max_; }
 
+    static std::shared_ptr<NumericProperty> convert(const Property& property)
+    {
+        const NumericProperty& cast = property.cast<NumericProperty>();
+        return std::make_shared<NumericProperty>(
+            property.name(), cast.value(), cast.min(), cast.max(), property.displayName());
+    }
 
     std::shared_ptr<Property> clone() const override
     {

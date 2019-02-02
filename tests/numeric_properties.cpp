@@ -30,6 +30,42 @@ void testNumericPropertyConstructor(const typename T::value_type& min, const typ
     CHECK_THROWS_AS(T("name", min - typename T::value_type(1), min, max), std::out_of_range);
 }
 
+template <class T>
+void testNumericPropertyCopyConstructor(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty copy-constructor");
+    T original("name", min, min, max, "display");
+    T prop(original);
+    checkNumericProperty(prop, min, min, max);
+}
+
+template <class T>
+void testNumericPropertyCopyOperator(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty copy-operator");
+    T original("name", min, min, max, "display");
+    T prop("name", max, "display");
+    prop = original;
+    checkNumericProperty(prop, min, min, max);
+}
+
+template <class T>
+void testNumericPropertyClone(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty clone");
+    T original("name", min, min, max, "display");
+    auto prop = original.clone();
+    checkNumericProperty(prop->template cast<T>(), min, min, max);
+}
+
+template <class T>
+void testNumericPropertyConvert(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty convert");
+    T original("name", min, min, max, "display");
+    auto prop = T::convert(original);
+    checkNumericProperty(*prop, min, min, max);
+}
 
 template <class T>
 void testNumericProperty(const typename T::value_type& min, const typename T::value_type& max)
@@ -37,6 +73,10 @@ void testNumericProperty(const typename T::value_type& min, const typename T::va
     {
         INFO("Constructors and related");
         testNumericPropertyConstructor<T>(min, max);
+        testNumericPropertyCopyConstructor<T>(min, max);
+        testNumericPropertyCopyOperator<T>(min, max);
+        testNumericPropertyClone<T>(min, max);
+        testNumericPropertyConvert<T>(min, max);
     }
 }
 
