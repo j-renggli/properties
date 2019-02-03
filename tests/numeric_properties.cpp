@@ -68,6 +68,86 @@ void testNumericPropertyConvert(const typename T::value_type& min, const typenam
 }
 
 template <class T>
+void testNumericPropertyAssignment(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty constructor");
+    T prop("name", min, min, max, "display");
+    prop = max;
+    checkNumericProperty(prop, max, min, max);
+}
+
+template <class T>
+void testNumericPropertyCopyConstructedAssignment(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty copy-constructor is independent from its base");
+    T original("name", min, min, max, "display");
+    T prop(original);
+    prop = max;
+    {
+        INFO("Original is intact");
+        checkNumericProperty(original, min, min, max);
+    }
+    {
+        INFO("Copy is modified");
+        checkNumericProperty(prop, max, min, max);
+    }
+}
+
+template <class T>
+void testNumericPropertyCopyOperatedAssignment(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty copy-operator is independent from its base");
+    T original("name", min, min, max, "display");
+    T prop("name", max, "display");
+    prop = original;
+    checkNumericProperty(prop, min, min, max);
+    prop = max;
+    {
+        INFO("Original is intact");
+        checkNumericProperty(original, min, min, max);
+    }
+    {
+        INFO("Copy is modified");
+        checkNumericProperty(prop, max, min, max);
+    }
+}
+
+template <class T>
+void testNumericPropertyClonedAssignment(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty clone is independent from its base");
+    T original("name", min, min, max, "display");
+    auto clone = original.clone();
+    T& prop = clone->template cast<T>();
+    prop = max;
+    {
+        INFO("Original is intact");
+        checkNumericProperty(original, min, min, max);
+    }
+    {
+        INFO("Copy is modified");
+        checkNumericProperty(prop, max, min, max);
+    }
+}
+
+template <class T>
+void testNumericPropertyConvertedAssignment(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty convert is independent from its base");
+    T original("name", min, min, max, "display");
+    auto prop = T::convert(original);
+    *prop = max;
+    {
+        INFO("Original is intact");
+        checkNumericProperty(original, min, min, max);
+    }
+    {
+        INFO("Copy is modified");
+        checkNumericProperty(*prop, max, min, max);
+    }
+}
+
+template <class T>
 void testNumericProperty(const typename T::value_type& min, const typename T::value_type& max)
 {
     {

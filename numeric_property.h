@@ -41,6 +41,17 @@ public:
         max_ = rhs.max_;
         return *this;
     }
+    NumericProperty& operator=(const value_type& value)
+    {
+        if (value < min_) {
+            throw std::out_of_range("Min value was not respected");
+        }
+        if (value > max_) {
+            throw std::out_of_range("Max value was not respected");
+        }
+        value_ = value;
+        return *this;
+    }
 
     static const std::string identifier;
     const std::string& id() const override { return identifier; }
@@ -48,9 +59,7 @@ public:
     const value_type& value() const { return value_; }
     value_type& value() { return value_; }
     const value_type& min() const { return min_; }
-    value_type& min() { return min_; }
     const value_type& max() const { return max_; }
-    value_type& max() { return max_; }
 
     static std::shared_ptr<NumericProperty> convert(const Property& property)
     {
