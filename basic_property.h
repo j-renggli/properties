@@ -36,7 +36,6 @@ public:
     const std::string& id() const override { return identifier; }
 
     const value_type& value() const { return value_; }
-    value_type& value() { return value_; }
 
     static std::shared_ptr<BasicProperty> convert(const Property& property)
     {

@@ -28,6 +28,8 @@ set(src
     property.h
     basic_property.cpp
     basic_property.h
+    group_property.cpp
+    group_property.h
     numeric_property.cpp
     numeric_property.h
 )

@@ -76,7 +76,6 @@ public:
     const std::string& id() const override { return identifier; }
 
     const value_type& value() const { return value_; }
-    value_type& value() { return value_; }
     const value_type& min() const { return min_; }
     const value_type& max() const { return max_; }
 

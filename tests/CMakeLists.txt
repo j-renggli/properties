@@ -2,6 +2,7 @@ set(src
     main.cpp
 
     basic_properties.cpp
+    group_properties.cpp
     numeric_properties.cpp
 )
 
