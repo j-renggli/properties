@@ -79,17 +79,10 @@ public:
     const value_type& min() const { return min_; }
     const value_type& max() const { return max_; }
 
-    static std::shared_ptr<NumericProperty> convert(const Property& property)
+    static NumericProperty convert(const Property& property)
     {
         const NumericProperty& cast = property.cast<NumericProperty>();
-        return std::make_shared<NumericProperty>(
-            property.name(), cast.value(), cast.min(), cast.max(), property.displayName());
-    }
-
-    std::shared_ptr<Property> clone(const std::string& name = "", const std::string& displayName = "") const override
-    {
-        return std::make_shared<NumericProperty>(
-            name.empty() ? name_ : name, value_, min_, max_, displayName.empty() ? displayName_ : displayName);
+        return NumericProperty(property.name(), cast.value(), cast.min(), cast.max(), property.displayName());
     }
 
 private:

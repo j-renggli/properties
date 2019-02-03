@@ -35,36 +35,10 @@ template <class T>
 void testBasicPropertyCopyOperator(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty copy-operator");
-    T original("name", value, "display");
+    T original("name2", value, "display2");
     T prop("name", other, "display");
     prop = original;
     checkBasicProperty(prop, value);
-}
-
-template <class T>
-void testBasicPropertyClone(const typename T::value_type& value)
-{
-    INFO("BasicProperty clone");
-    T original("name", value, "display");
-    {
-        INFO("Keep names");
-        auto prop = original.clone();
-        checkBasicProperty(prop->template cast<T>(), value);
-    }
-    {
-        INFO("Change name");
-        auto prop = original.clone("rename");
-        CHECK(prop->template cast<T>().value() == value);
-        CHECK(prop->name() == "rename");
-        CHECK(prop->displayName() == "display");
-    }
-    {
-        INFO("Change name and display name");
-        auto prop = original.clone("rename", "redisplay");
-        CHECK(prop->template cast<T>().value() == value);
-        CHECK(prop->name() == "rename");
-        CHECK(prop->displayName() == "redisplay");
-    }
 }
 
 template <class T>
@@ -73,7 +47,7 @@ void testBasicPropertyConvert(const typename T::value_type& value)
     INFO("BasicProperty convert");
     T original("name", value, "display");
     auto prop = T::convert(original);
-    checkBasicProperty(*prop, value);
+    checkBasicProperty(prop, value);
 }
 
 template <class T>
@@ -111,26 +85,14 @@ void testBasicPropertyCopyOperatedAssignment(const typename T::value_type& value
 }
 
 template <class T>
-void testBasicPropertyClonedAssignment(const typename T::value_type& value, const typename T::value_type& other)
-{
-    INFO("BasicProperty clone is independent from its base");
-    T original("name", value, "display");
-    auto clone = original.clone();
-    T& prop = clone->template cast<T>();
-    prop = other;
-    checkBasicProperty(original, value);
-    checkBasicProperty(prop, other);
-}
-
-template <class T>
 void testBasicPropertyConvertedAssignment(const typename T::value_type& value, const typename T::value_type& other)
 {
     INFO("BasicProperty convert is independent from its base");
     T original("name", value, "display");
     auto prop = T::convert(original);
-    *prop = other;
+    prop = other;
     checkBasicProperty(original, value);
-    checkBasicProperty(*prop, other);
+    checkBasicProperty(prop, other);
 }
 
 template <class T>
@@ -162,7 +124,6 @@ void testBasicProperty(const typename T::value_type& base, const typename T::val
         testBasicPropertyConstructor<T>(base);
         testBasicPropertyCopyConstructor<T>(base);
         testBasicPropertyCopyOperator<T>(base, other);
-        testBasicPropertyClone<T>(base);
         testBasicPropertyConvert<T>(base);
     }
 
@@ -171,7 +132,6 @@ void testBasicProperty(const typename T::value_type& base, const typename T::val
         testBasicPropertyAssignment<T>(base, other);
         testBasicPropertyCopyConstructedAssignment<T>(base, other);
         testBasicPropertyCopyOperatedAssignment<T>(base, other);
-        testBasicPropertyClonedAssignment<T>(base, other);
         testBasicPropertyConvertedAssignment<T>(base, other);
     }
 

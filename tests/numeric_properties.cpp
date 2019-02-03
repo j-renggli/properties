@@ -65,36 +65,10 @@ template <class T>
 void testNumericPropertyCopyOperator(const typename T::value_type& min, const typename T::value_type& max)
 {
     INFO("NumericProperty copy-operator");
-    T original("name", min, min, max, "display");
+    T original("name2", min, min, max, "display2");
     T prop("name", max, "display");
     prop = original;
     checkNumericProperty(prop, min, min, max);
-}
-
-template <class T>
-void testNumericPropertyClone(const typename T::value_type& min, const typename T::value_type& max)
-{
-    INFO("NumericProperty clone");
-    T original("name", min, min, max, "display");
-    {
-        INFO("Keep names");
-        auto prop = original.clone();
-        checkNumericProperty(prop->template cast<T>(), min, min, max);
-    }
-    {
-        INFO("Change name");
-        auto prop = original.clone("rename");
-        CHECK(prop->template cast<T>().value() == min);
-        CHECK(prop->name() == "rename");
-        CHECK(prop->displayName() == "display");
-    }
-    {
-        INFO("Change name and display name");
-        auto prop = original.clone("rename", "redisplay");
-        CHECK(prop->template cast<T>().value() == min);
-        CHECK(prop->name() == "rename");
-        CHECK(prop->displayName() == "redisplay");
-    }
 }
 
 template <class T>
@@ -103,7 +77,7 @@ void testNumericPropertyConvert(const typename T::value_type& min, const typenam
     INFO("NumericProperty convert");
     T original("name", min, min, max, "display");
     auto prop = T::convert(original);
-    checkNumericProperty(*prop, min, min, max);
+    checkNumericProperty(prop, min, min, max);
 }
 
 template <class T>
@@ -152,12 +126,11 @@ void testNumericPropertyCopyOperatedAssignment(const typename T::value_type& min
 }
 
 template <class T>
-void testNumericPropertyClonedAssignment(const typename T::value_type& min, const typename T::value_type& max)
+void testNumericPropertyConvertedAssignment(const typename T::value_type& min, const typename T::value_type& max)
 {
-    INFO("NumericProperty clone is independent from its base");
+    INFO("NumericProperty convert is independent from its base");
     T original("name", min, min, max, "display");
-    auto clone = original.clone();
-    T& prop = clone->template cast<T>();
+    auto prop = T::convert(original);
     prop = max;
     {
         INFO("Original is intact");
@@ -166,23 +139,6 @@ void testNumericPropertyClonedAssignment(const typename T::value_type& min, cons
     {
         INFO("Copy is modified");
         checkNumericProperty(prop, max, min, max);
-    }
-}
-
-template <class T>
-void testNumericPropertyConvertedAssignment(const typename T::value_type& min, const typename T::value_type& max)
-{
-    INFO("NumericProperty convert is independent from its base");
-    T original("name", min, min, max, "display");
-    auto prop = T::convert(original);
-    *prop = max;
-    {
-        INFO("Original is intact");
-        checkNumericProperty(original, min, min, max);
-    }
-    {
-        INFO("Copy is modified");
-        checkNumericProperty(*prop, max, min, max);
     }
 }
 
@@ -215,7 +171,6 @@ void testNumericProperty(const typename T::value_type& min, const typename T::va
         testNumericPropertyConstructor<T>(min, max);
         testNumericPropertyCopyConstructor<T>(min, max);
         testNumericPropertyCopyOperator<T>(min, max);
-        testNumericPropertyClone<T>(min, max);
         testNumericPropertyConvert<T>(min, max);
     }
 
@@ -224,7 +179,6 @@ void testNumericProperty(const typename T::value_type& min, const typename T::va
         testNumericPropertyAssignment<T>(min, max);
         testNumericPropertyCopyConstructedAssignment<T>(min, max);
         testNumericPropertyCopyOperatedAssignment<T>(min, max);
-        testNumericPropertyClonedAssignment<T>(min, max);
         testNumericPropertyConvertedAssignment<T>(min, max);
     }
 

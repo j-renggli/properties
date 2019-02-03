@@ -30,6 +30,7 @@ set(src
     basic_property.h
     group_property.cpp
     group_property.h
+    known_group_property.h
     numeric_property.cpp
     numeric_property.h
 )

@@ -11,12 +11,14 @@ class BasicProperty : public Property
 public:
     using value_type = T;
 
+    /// Constructor for a basic property
     BasicProperty(const std::string& name, const value_type& value, const std::string displayName = "")
         : Property(name, displayName), value_{value}
     {
     }
     ~BasicProperty() override {}
 
+    /// Copy-operators: do not modify the name
     BasicProperty& operator=(const BasicProperty& rhs)
     {
         value_ = rhs.value_;
@@ -37,16 +39,9 @@ public:
 
     const value_type& value() const { return value_; }
 
-    static std::shared_ptr<BasicProperty> convert(const Property& property)
+    static BasicProperty convert(const Property& property)
     {
-        return std::make_shared<BasicProperty>(
-            property.name(), property.cast<BasicProperty>().value(), property.displayName());
-    }
-
-    std::shared_ptr<Property> clone(const std::string& name = "", const std::string& displayName = "") const override
-    {
-        return std::make_shared<BasicProperty>(
-            name.empty() ? name_ : name, value_, displayName.empty() ? displayName_ : displayName);
+        return BasicProperty(property.name(), property.cast<BasicProperty>().value(), property.displayName());
     }
 
 private:
