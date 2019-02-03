@@ -46,8 +46,25 @@ void testBasicPropertyClone(const typename T::value_type& value)
 {
     INFO("BasicProperty clone");
     T original("name", value, "display");
-    auto prop = original.clone();
-    checkBasicProperty(prop->template cast<T>(), value);
+    {
+        INFO("Keep names");
+        auto prop = original.clone();
+        checkBasicProperty(prop->template cast<T>(), value);
+    }
+    {
+        INFO("Change name");
+        auto prop = original.clone("rename");
+        CHECK(prop->template cast<T>().value() == value);
+        CHECK(prop->name() == "rename");
+        CHECK(prop->displayName() == "display");
+    }
+    {
+        INFO("Change name and display name");
+        auto prop = original.clone("rename", "redisplay");
+        CHECK(prop->template cast<T>().value() == value);
+        CHECK(prop->name() == "rename");
+        CHECK(prop->displayName() == "redisplay");
+    }
 }
 
 template <class T>

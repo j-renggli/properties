@@ -76,8 +76,25 @@ void testNumericPropertyClone(const typename T::value_type& min, const typename 
 {
     INFO("NumericProperty clone");
     T original("name", min, min, max, "display");
-    auto prop = original.clone();
-    checkNumericProperty(prop->template cast<T>(), min, min, max);
+    {
+        INFO("Keep names");
+        auto prop = original.clone();
+        checkNumericProperty(prop->template cast<T>(), min, min, max);
+    }
+    {
+        INFO("Change name");
+        auto prop = original.clone("rename");
+        CHECK(prop->template cast<T>().value() == min);
+        CHECK(prop->name() == "rename");
+        CHECK(prop->displayName() == "display");
+    }
+    {
+        INFO("Change name and display name");
+        auto prop = original.clone("rename", "redisplay");
+        CHECK(prop->template cast<T>().value() == min);
+        CHECK(prop->name() == "rename");
+        CHECK(prop->displayName() == "redisplay");
+    }
 }
 
 template <class T>

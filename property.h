@@ -69,7 +69,8 @@ public:
     const std::string& name() const { return name_; }
     const std::string& displayName() const { return displayName_; }
 
-    virtual std::shared_ptr<Property> clone() const = 0;
+    virtual std::shared_ptr<Property> clone(const std::string& name = "",
+                                            const std::string& displayName = "") const = 0;
     template <class T>
     T& cast()
     {

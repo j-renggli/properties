@@ -18,8 +18,8 @@ public:
 
     NumericProperty(const std::string& name,
                     const value_type& value,
-                    const value_type& min = -max_value,
-                    const value_type& max = max_value,
+                    const value_type& min = value_type(-max_value),
+                    const value_type& max = value_type(max_value),
                     const std::string displayName = "")
         : Property(name, displayName), value_{value}, min_{min}, max_{max}
     {
@@ -37,7 +37,7 @@ public:
         }
     }
 
-    NumericProperty(const std::string& name, const value_type& value, const std::string displayName = "")
+    NumericProperty(const std::string& name, const value_type& value, const std::string displayName)
         : NumericProperty(name, value, value_type(-max_value), value_type(max_value), displayName)
     {
     }
@@ -87,9 +87,10 @@ public:
             property.name(), cast.value(), cast.min(), cast.max(), property.displayName());
     }
 
-    std::shared_ptr<Property> clone() const override
+    std::shared_ptr<Property> clone(const std::string& name = "", const std::string& displayName = "") const override
     {
-        return std::make_shared<NumericProperty>(name_, value_, min_, max_, displayName_);
+        return std::make_shared<NumericProperty>(
+            name.empty() ? name_ : name, value_, min_, max_, displayName.empty() ? displayName_ : displayName);
     }
 
 private:

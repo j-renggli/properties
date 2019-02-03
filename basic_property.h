@@ -44,9 +44,10 @@ public:
             property.name(), property.cast<BasicProperty>().value(), property.displayName());
     }
 
-    std::shared_ptr<Property> clone() const override
+    std::shared_ptr<Property> clone(const std::string& name = "", const std::string& displayName = "") const override
     {
-        return std::make_shared<BasicProperty>(name_, value_, displayName_);
+        return std::make_shared<BasicProperty>(
+            name.empty() ? name_ : name, value_, displayName.empty() ? displayName_ : displayName);
     }
 
 private:
