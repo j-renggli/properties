@@ -15,6 +15,7 @@ public:
         : Property(name, displayName), value_{value}
     {
     }
+    ~BasicProperty() override {}
 
     BasicProperty& operator=(const BasicProperty& rhs)
     {

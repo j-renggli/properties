@@ -129,7 +129,7 @@ void testBasicPropertyEquality(const typename T::value_type& value)
 template <class T>
 void testBasicPropertyUnequality(const typename T::value_type& value, const typename T::value_type& other)
 {
-    INFO("BasicProperty is not equal to another of differnt name or value");
+    INFO("BasicProperty is not equal to another of different name or value");
     T base("name", value, "display");
     T name("name2", value, "display");
     T val("name", other, "display");

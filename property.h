@@ -50,6 +50,7 @@ public:
         : name_{name}, displayName_{displayName.empty() ? name : displayName}
     {
     }
+    virtual ~Property() {}
 
     operator std::string() const
     {

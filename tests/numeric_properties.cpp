@@ -8,8 +8,8 @@ namespace property
 template <class T>
 void checkNumericProperty(const T& prop,
                           const typename T::value_type& value,
-                          const typename T::value_type& min = -std::numeric_limits<typename T::value_type>::infinity(),
-                          const typename T::value_type& max = std::numeric_limits<typename T::value_type>::infinity())
+                          const typename T::value_type& min = typename T::value_type(-T::max_value),
+                          const typename T::value_type& max = typename T::value_type(T::max_value))
 {
     CHECK(prop.value() == value);
     CHECK(prop.name() == "name");
@@ -23,11 +23,33 @@ template <class T>
 void testNumericPropertyConstructor(const typename T::value_type& min, const typename T::value_type& max)
 {
     INFO("NumericProperty constructor");
-    T prop1("name", min, "display");
-    checkNumericProperty(prop1, min);
-    T prop2("name", max, min, max, "display");
-    checkNumericProperty(prop2, max, min, max);
-    CHECK_THROWS_AS(T("name", min - typename T::value_type(1), min, max), std::out_of_range);
+    {
+        INFO("Can construct a basic numeric property");
+        T prop1("name", min, "display");
+        checkNumericProperty(prop1, min);
+    }
+    {
+        INFO("Can construct a numeric property with limits");
+        T prop2("name", max, min, max, "display");
+        checkNumericProperty(prop2, max, min, max);
+    }
+    {
+        INFO("Can construct a numeric property with single allowed value");
+        T prop2("name", min, min, min, "display");
+        checkNumericProperty(prop2, min, min, min);
+    }
+    {
+        INFO("Cannot construct a numeric property without respecting min value");
+        CHECK_THROWS_AS(T("name", min - typename T::value_type(1), min, max), std::out_of_range);
+    }
+    {
+        INFO("Cannot construct a numeric property without respecting max value");
+        CHECK_THROWS_AS(T("name", max + typename T::value_type(1), min, max), std::out_of_range);
+    }
+    {
+        INFO("Cannot construct a numeric property with min > max");
+        CHECK_THROWS_AS(T("name", min, max, min), std::out_of_range);
+    }
 }
 
 template <class T>
@@ -148,6 +170,27 @@ void testNumericPropertyConvertedAssignment(const typename T::value_type& min, c
 }
 
 template <class T>
+void testNumericPropertyEquality(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty equals another of same name and value");
+    T left("name", min, min, max, "display");
+    T right("name", min, min, max, "display2");
+    CHECK(left == left);
+    CHECK(left == right);
+}
+
+template <class T>
+void testNumericPropertyUnequality(const typename T::value_type& min, const typename T::value_type& max)
+{
+    INFO("NumericProperty is not equal to another of different name, value, min or max");
+    const T base("name", min, min, max, "display");
+    CHECK(base != T("name2", min, min, max, "display"));
+    CHECK(base != T("name", max, min, max, "display"));
+    CHECK(base != T("name", min, min - 1, max, "display"));
+    CHECK(base != T("name", min, min, max + 1, "display"));
+}
+
+template <class T>
 void testNumericProperty(const typename T::value_type& min, const typename T::value_type& max)
 {
     {
@@ -158,12 +201,44 @@ void testNumericProperty(const typename T::value_type& min, const typename T::va
         testNumericPropertyClone<T>(min, max);
         testNumericPropertyConvert<T>(min, max);
     }
+
+    {
+        INFO("Set value modifies only target object");
+        testNumericPropertyAssignment<T>(min, max);
+        testNumericPropertyCopyConstructedAssignment<T>(min, max);
+        testNumericPropertyCopyOperatedAssignment<T>(min, max);
+        testNumericPropertyClonedAssignment<T>(min, max);
+        testNumericPropertyConvertedAssignment<T>(min, max);
+    }
+
+    {
+        INFO("Equality of basic properties");
+        testNumericPropertyEquality<T>(min, max);
+        testNumericPropertyUnequality<T>(min, max);
+    }
+
+    {
+        INFO("To string");
+        T prop("a_name", min, "Display");
+        std::stringstream ss;
+        ss << "Display=" << T::identifier << "[";
+        stream::convert(ss, min) << "]";
+        std::wstringstream wss;
+        wss << L"Display=";
+        stream::convert(wss, T::identifier) << L"[";
+        stream::convert(wss, min) << L"]";
+        CHECK(static_cast<std::string>(prop) == ss.str());
+        CHECK(static_cast<std::wstring>(prop) == wss.str());
+    }
 }
 
 TEST_CASE("Test IntProperty")
 {
     testNumericProperty<IntProperty>(1, 2);
+}
 
-    // MIN == MAX!
+TEST_CASE("Test DoubleProperty")
+{
+    testNumericProperty<DoubleProperty>(-1.3, 2.777);
 }
 }
