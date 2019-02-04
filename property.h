@@ -87,6 +87,10 @@ public:
     virtual std::wostream& str(std::wostream& out) const { return stream::convert(out, displayName_); }
 
 protected:
+    /// Returns true if the types and names don't match
+    bool different(const Property& rhs) const { return id() != rhs.id() || name_ != rhs.name_; }
+
+protected:
     const std::string name_;
     const std::string displayName_;
 };

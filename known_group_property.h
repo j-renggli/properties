@@ -16,8 +16,9 @@ public:
     }
     ~KnownGroupProperty() override {}
 
-    GroupPropertyIterator begin() override { return GroupPropertyIterator(children_, true); }
-    GroupPropertyIterator end() override { return GroupPropertyIterator(children_, false); }
+    GroupPropertyIterator begin() const override { return GroupPropertyIterator(children_, true); }
+    GroupPropertyIterator end() const override { return GroupPropertyIterator(children_, false); }
+    size_t size() const override { return N; }
 
 private:
     const Children children_;

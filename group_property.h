@@ -54,13 +54,35 @@ public:
     GroupProperty(const std::string& name, const std::string displayName = "") : Property(name, displayName) {}
     ~GroupProperty() override {}
 
+    STR(out << "="; stream::convert(out, identifier) << "["; auto it = begin(); if (it != end()) it->str(out);
+        while (++it != end()) {
+            out << ",";
+            it->str(out);
+        };
+        out << "]";)
 
     static const std::string identifier;
     const std::string& id() const override { return identifier; }
 
-    virtual GroupPropertyIterator begin() = 0;
-    virtual GroupPropertyIterator end() = 0;
+    virtual GroupPropertyIterator begin() const = 0;
+    virtual GroupPropertyIterator find(const std::string& name) const
+    {
+        for (auto it = begin(); it != end(); ++it) {
+            if (it->name() == name)
+                return it;
+        }
+        return end();
+    }
+    virtual GroupPropertyIterator end() const = 0;
+    virtual size_t size() const = 0;
 
-
+    template <class T>
+    const T& at(const std::string& name) const
+    {
+        auto it = find(name);
+        if (it != end())
+            return it->cast<T>();
+        throw std::out_of_range("No child with name: " + name);
+    }
 };
 }

@@ -30,7 +30,7 @@ public:
         return *this;
     }
     bool operator==(const BasicProperty& rhs) const { return !operator!=(rhs); }
-    bool operator!=(const BasicProperty& rhs) const { return name_ != rhs.name_ || value_ != rhs.value_; }
+    bool operator!=(const BasicProperty& rhs) const { return different(rhs) || value_ != rhs.value_; }
 
     STR(out << "="; stream::convert(out, identifier) << "["; stream::convert(out, value_) << "]";)
 

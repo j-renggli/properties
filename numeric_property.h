@@ -66,7 +66,7 @@ public:
     bool operator==(const NumericProperty& rhs) const { return !operator!=(rhs); }
     bool operator!=(const NumericProperty& rhs) const
     {
-        return name_ != rhs.name_ || value_ != rhs.value_ || min_ != rhs.min_ || max_ != rhs.max_;
+        return different(rhs) || value_ != rhs.value_ || min_ != rhs.min_ || max_ != rhs.max_;
     }
 
     STR(out << "="; stream::convert(out, identifier) << "["; stream::convert(out, value_) << "]";)
