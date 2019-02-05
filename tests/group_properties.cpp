@@ -156,8 +156,8 @@ public:
     static XYProperty convert(const Property& property)
     {
         return XYProperty(property.name(),
-                          property.cast<GroupProperty>().at<IntProperty>("x"),
-                          property.cast<GroupProperty>().at<IntProperty>("y"),
+                          property.cast<GroupProperty>().get<IntProperty>("x"),
+                          property.cast<GroupProperty>().get<IntProperty>("y"),
                           property.displayName());
     }
 

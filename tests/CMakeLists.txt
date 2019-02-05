@@ -4,6 +4,8 @@ set(src
     basic_properties.cpp
     group_properties.cpp
     numeric_properties.cpp
+
+    serialise.cpp
 )
 
 add_executable(test_properties ${src})

@@ -77,7 +77,7 @@ public:
     virtual size_t size() const = 0;
 
     template <class T>
-    const T& at(const std::string& name) const
+    const T& get(const std::string& name) const
     {
         auto it = find(name);
         if (it != end())
