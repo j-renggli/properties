@@ -28,21 +28,11 @@ private:
     virtual void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) = 0;
 };
 
-class JSONStringSerialiser : public JSONPropertySerialiser
+template <class T>
+class JSONBasicSerialiser : public JSONPropertySerialiser
 {
 public:
-    using value_type = StringProperty;
-
-    void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) override
-    {
-        node.node_["value"] = prop.cast<value_type>().value();
-    }
-};
-
-class JSONBooleanSerialiser : public JSONPropertySerialiser
-{
-public:
-    using value_type = BooleanProperty;
+    using value_type = T;
 
     void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) override
     {
@@ -69,7 +59,8 @@ public:
 };
 
 JSONSerialiser::JSONSerialiser()
-    : Serialiser(Mapper<JSONStringSerialiser, JSONBooleanSerialiser, JSONGroupSerialiser>())
+    : Serialiser(
+          Mapper<JSONBasicSerialiser<StringProperty>, JSONBasicSerialiser<BooleanProperty>, JSONGroupSerialiser>())
 {
 }
 

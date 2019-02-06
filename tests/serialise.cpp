@@ -65,8 +65,9 @@ TEST_CASE("Serialise to JSON")
 
     SECTION("Group")
     {
-        CHECK(serialiser.serialise(Bool2Property("XY", BooleanProperty("a", true), BooleanProperty("b", false))) ==
-              R"JSON({"display":"MyBool","id":"bool","name":"Boole","value":true})JSON");
+        CHECK(
+            serialiser.serialise(Bool2Property("XY", BooleanProperty("a", true), BooleanProperty("b", false))) ==
+            R"JSON({"children":[{"display":"a","id":"bool","name":"a","value":true},{"display":"a","id":"bool","name":"a","value":true}],"display":"XY","id":"group","name":"XY"})JSON");
     }
 }
 }
