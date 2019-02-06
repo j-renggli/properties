@@ -1,5 +1,6 @@
 #pragma once
 
+#include "properties_export.h"
 #include "property.h"
 
 #include <array>
@@ -48,7 +49,7 @@ private:
     size_t size_;
 };
 
-class GroupProperty : public Property
+class PROPERTIES_EXPORT GroupProperty : public Property
 {
 public:
     GroupProperty(const std::string& name, const std::string displayName = "") : Property(name, displayName) {}

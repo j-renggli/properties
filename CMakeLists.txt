@@ -33,9 +33,14 @@ set(src
     known_group_property.h
     numeric_property.cpp
     numeric_property.h
+
+    serialisation/json_serialiser.cpp
+    serialisation/json_serialiser.h
+    serialisation/serialiser.cpp
+    serialisation/serialiser.h
 )
 
-add_library(properties ${src})
+add_library(properties SHARED ${src})
 
 generate_export_header(properties)
 target_include_directories(properties PUBLIC ${CMAKE_CURRENT_BINARY_DIR})

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "properties_export.h"
 #include "property.h"
 
 #include <limits>
@@ -8,7 +9,7 @@ namespace property
 {
 
 template <class T>
-class NumericProperty : public Property
+class PROPERTIES_EXPORT NumericProperty : public Property
 {
 public:
     using value_type = T;

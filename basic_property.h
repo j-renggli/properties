@@ -1,12 +1,13 @@
 #pragma once
 
+#include "properties_export.h"
 #include "property.h"
 
 namespace property
 {
 
 template <class T>
-class BasicProperty : public Property
+class PROPERTIES_EXPORT BasicProperty : public Property
 {
 public:
     using value_type = T;
