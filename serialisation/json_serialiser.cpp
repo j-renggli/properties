@@ -15,17 +15,17 @@ struct JSONNode : public Node {
 class JSONPropertySerialiser : public PropertySerialiser
 {
 private:
-    void serialise(Node& raw, const Property& prop) override
+    void serialise(Serialiser& serialiser, Node& raw, const Property& prop) override
     {
         JSONNode& node = raw.cast<JSONNode>();
         node.node_["id"] = prop.id();
         node.node_["name"] = prop.name();
         node.node_["display"] = prop.displayName();
 
-        serialiseSpecific(node, prop);
+        serialiseInternals(serialiser, node, prop);
     }
 
-    virtual void serialiseSpecific(JSONNode& node, const Property& prop) = 0;
+    virtual void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) = 0;
 };
 
 class JSONStringSerialiser : public JSONPropertySerialiser
@@ -33,7 +33,7 @@ class JSONStringSerialiser : public JSONPropertySerialiser
 public:
     using value_type = StringProperty;
 
-    void serialiseSpecific(JSONNode& node, const Property& prop) override
+    void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) override
     {
         node.node_["value"] = prop.cast<value_type>().value();
     }
@@ -44,13 +44,32 @@ class JSONBooleanSerialiser : public JSONPropertySerialiser
 public:
     using value_type = BooleanProperty;
 
-    void serialiseSpecific(JSONNode& node, const Property& prop) override
+    void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) override
     {
         node.node_["value"] = prop.cast<value_type>().value();
     }
 };
 
-JSONSerialiser::JSONSerialiser() : Serialiser(Mapper<JSONStringSerialiser, JSONBooleanSerialiser>())
+class JSONGroupSerialiser : public JSONPropertySerialiser
+{
+public:
+    using value_type = GroupProperty;
+
+    void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) override
+    {
+        const value_type& group = prop.cast<value_type>();
+        const size_t size = group.size();
+        node.node_["children"] = std::vector<json>(size);
+        auto it = group.begin();
+        for (size_t i = 0; i < size; ++i) {
+            JSONNode child(node.node_["children"][i]);
+            serialiser.serialiseNode(child, *it);
+        }
+    }
+};
+
+JSONSerialiser::JSONSerialiser()
+    : Serialiser(Mapper<JSONStringSerialiser, JSONBooleanSerialiser, JSONGroupSerialiser>())
 {
 }
 

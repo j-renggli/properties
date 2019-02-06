@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../basic_property.h"
+#include "../group_property.h"
 #include "../property.h"
 
 #include <map>
@@ -19,18 +20,21 @@ struct Node {
     }
 };
 
+class Serialiser;
+
 class PropertySerialiser
 {
 public:
-    virtual void serialise(Node& node, const Property& prop) = 0;
+    virtual void serialise(Serialiser& serialiser, Node& node, const Property& prop) = 0;
 };
 
-template <class String, class Bool>
+template <class String, class Bool, class Group>
 struct Mapper {
-    void fill(std::map<std::string, std::unique_ptr<PropertySerialiser>>& serialisers) const
+    void fill(/*Serialiser& serialiser,*/ std::map<std::string, std::unique_ptr<PropertySerialiser>>& serialisers) const
     {
         map<String, StringProperty>(serialisers);
         map<Bool, BooleanProperty>(serialisers);
+        map<Group, GroupProperty>(serialisers);
     }
 
     template <class S, class P>
@@ -50,7 +54,7 @@ public:
         mapper.fill(serialisers_);
     }
 
-protected:
+//protected:
     void serialiseNode(Node& node, const Property& prop);
 
 private:
