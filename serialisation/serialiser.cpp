@@ -5,10 +5,10 @@
 namespace property
 {
 
-void Serialiser::serialiseNode(Node& node, const Property& prop)
+void Serialiser::serialiseNode(Node& node, const Property& prop) const
 {
     auto it = serialisers_.find(prop.id());
     assert(it != serialisers_.end());
-    it->second->serialise(*this, node, prop);
+    it->second->serialise(node, prop);
 }
 }

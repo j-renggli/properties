@@ -20,21 +20,24 @@ struct Node {
     }
 };
 
-class Serialiser;
-
 class PropertySerialiser
 {
 public:
-    virtual void serialise(Serialiser& serialiser, Node& node, const Property& prop) = 0;
+    virtual void serialise(Node& node, const Property& prop) = 0;
 };
 
 template <class String, class Bool, class Group>
 struct Mapper {
-    void fill(/*Serialiser& serialiser,*/ std::map<std::string, std::unique_ptr<PropertySerialiser>>& serialisers) const
+    void fill(std::map<std::string, std::unique_ptr<PropertySerialiser>>& serialisers,
+              std::function<void(Node& node, const Property& prop)> serialiseChild) const
     {
         map<String, StringProperty>(serialisers);
         map<Bool, BooleanProperty>(serialisers);
-        map<Group, GroupProperty>(serialisers);
+
+        // Group is special
+        static_assert(std::is_same<typename Group::value_type, GroupProperty>::value,
+                      "Invalid serialiser for group property");
+        serialisers[GroupProperty::identifier] = std::unique_ptr<Group>(new Group(serialiseChild));
     }
 
     template <class S, class P>
@@ -51,11 +54,11 @@ public:
     template <class Map>
     Serialiser(const Map& mapper)
     {
-        mapper.fill(serialisers_);
+        mapper.fill(serialisers_, [this](Node& node, const Property& prop) { serialiseNode(node, prop); });
     }
 
-//protected:
-    void serialiseNode(Node& node, const Property& prop);
+protected:
+    void serialiseNode(Node& node, const Property& prop) const;
 
 private:
     std::map<std::string, std::unique_ptr<PropertySerialiser>> serialisers_;

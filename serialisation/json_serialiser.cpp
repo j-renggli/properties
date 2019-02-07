@@ -15,17 +15,17 @@ struct JSONNode : public Node {
 class JSONPropertySerialiser : public PropertySerialiser
 {
 private:
-    void serialise(Serialiser& serialiser, Node& raw, const Property& prop) override
+    void serialise(Node& raw, const Property& prop) override
     {
         JSONNode& node = raw.cast<JSONNode>();
         node.node_["id"] = prop.id();
         node.node_["name"] = prop.name();
         node.node_["display"] = prop.displayName();
 
-        serialiseInternals(serialiser, node, prop);
+        serialiseInternals(node, prop);
     }
 
-    virtual void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) = 0;
+    virtual void serialiseInternals(JSONNode& node, const Property& prop) = 0;
 };
 
 template <class T>
@@ -34,7 +34,7 @@ class JSONBasicSerialiser : public JSONPropertySerialiser
 public:
     using value_type = T;
 
-    void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) override
+    void serialiseInternals(JSONNode& node, const Property& prop) override
     {
         node.node_["value"] = prop.cast<value_type>().value();
     }
@@ -45,7 +45,12 @@ class JSONGroupSerialiser : public JSONPropertySerialiser
 public:
     using value_type = GroupProperty;
 
-    void serialiseInternals(Serialiser& serialiser, JSONNode& node, const Property& prop) override
+    JSONGroupSerialiser(std::function<void(Node& node, const Property& prop)> serialiseChild)
+        : serialiseChild_{serialiseChild}
+    {
+    }
+
+    void serialiseInternals(JSONNode& node, const Property& prop) override
     {
         const value_type& group = prop.cast<value_type>();
         const size_t size = group.size();
@@ -53,9 +58,12 @@ public:
         auto it = group.begin();
         for (size_t i = 0; i < size; ++i) {
             JSONNode child(node.node_["children"][i]);
-            serialiser.serialiseNode(child, *it);
+            serialiseChild_(child, *it);
         }
     }
+
+private:
+    std::function<void(Node& node, const Property& prop)> serialiseChild_;
 };
 
 JSONSerialiser::JSONSerialiser()
