@@ -5,6 +5,7 @@ set(src
     group_properties.cpp
     numeric_properties.cpp
 
+    deserialise.cpp
     serialise.cpp
 )
 

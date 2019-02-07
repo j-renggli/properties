@@ -9,6 +9,8 @@ namespace property
 struct JSONNode : public Node {
     JSONNode(json& node) : node_{node} {}
 
+    std::string id() override { return node_["id"]; }
+
     json& node_;
 };
 
@@ -34,6 +36,12 @@ class JSONBasicSerialiser : public JSONPropertySerialiser
 public:
     using value_type = T;
 
+    std::unique_ptr<Property> deserialise(Node& raw) override
+    {
+        JSONNode& node = raw.cast<JSONNode>();
+        return std::make_unique<T>(node.node_["name"], node.node_["value"], node.node_["display"]);
+    }
+
     void serialiseInternals(JSONNode& node, const Property& prop) override
     {
         node.node_["value"] = prop.cast<value_type>().value();
@@ -48,6 +56,11 @@ public:
     JSONGroupSerialiser(std::function<void(Node& node, const Property& prop)> serialiseChild)
         : serialiseChild_{serialiseChild}
     {
+    }
+
+    std::unique_ptr<Property> deserialise(Node& raw) override
+    {
+        return std::unique_ptr<Property>();
     }
 
     void serialiseInternals(JSONNode& node, const Property& prop) override
@@ -72,7 +85,14 @@ JSONSerialiser::JSONSerialiser()
 {
 }
 
-std::string JSONSerialiser::serialise(const Property& prop)
+std::unique_ptr<Property> JSONSerialiser::deserialise(const std::string& jsonString) const
+{
+    json root = json::parse(jsonString);
+    JSONNode node{root};
+    return deserialiseNode(node);
+}
+
+std::string JSONSerialiser::serialise(const Property& prop) const
 {
     json root;
     JSONNode node{root};

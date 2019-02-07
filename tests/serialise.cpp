@@ -4,9 +4,6 @@
 
 #include <known_group_property.h>
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
-
 namespace property
 {
 

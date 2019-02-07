@@ -13,6 +13,8 @@ namespace property
 struct Node {
     virtual ~Node() = default;
 
+    virtual std::string id() = 0;
+
     template <class T>
     T& cast()
     {
@@ -23,6 +25,7 @@ struct Node {
 class PropertySerialiser
 {
 public:
+    virtual std::unique_ptr<Property> deserialise(Node& node) = 0;
     virtual void serialise(Node& node, const Property& prop) = 0;
 };
 
@@ -58,6 +61,7 @@ public:
     }
 
 protected:
+    std::unique_ptr<Property> deserialiseNode(Node& node) const;
     void serialiseNode(Node& node, const Property& prop) const;
 
 private:
