@@ -37,9 +37,16 @@ public:
                                     std::to_string(value_));
         }
     }
-
     NumericProperty(const std::string& name, const value_type& value, const std::string displayName)
         : NumericProperty(name, value, value_type(-max_value), value_type(max_value), displayName)
+    {
+    }
+    NumericProperty(const std::string& name, const NumericProperty& rhs, const std::string displayName = "")
+        : NumericProperty(name,
+                          rhs.value(),
+                          rhs.min(),
+                          rhs.max(),
+                          displayName.empty() ? rhs.displayName() : displayName)
     {
     }
 

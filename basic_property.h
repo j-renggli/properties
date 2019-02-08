@@ -17,6 +17,10 @@ public:
         : Property(name, displayName), value_{value}
     {
     }
+    BasicProperty(const std::string& name, const BasicProperty& rhs, const std::string& displayName = "")
+        : BasicProperty(name, rhs.value(), displayName.empty() ? rhs.displayName() : displayName)
+    {
+    }
     ~BasicProperty() override {}
 
     /// Copy-operators: do not modify the name

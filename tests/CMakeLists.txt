@@ -1,5 +1,7 @@
 set(src
     main.cpp
+    bool2property.h
+    xyproperty.h
 
     basic_properties.cpp
     group_properties.cpp

@@ -39,7 +39,8 @@ public:
     std::unique_ptr<Property> deserialise(Node& raw) override
     {
         JSONNode& node = raw.cast<JSONNode>();
-        return std::make_unique<T>(node.node_["name"], node.node_["value"], node.node_["display"]);
+        const typename T::value_type value = node.node_["value"];
+        return std::make_unique<T>(node.node_["name"], value, node.node_["display"]);
     }
 
     void serialiseInternals(JSONNode& node, const Property& prop) override
@@ -48,19 +49,50 @@ public:
     }
 };
 
+class JSONGroupProperty : public GroupProperty
+{
+public:
+    JSONGroupProperty(std::function<std::unique_ptr<Property>(Node& node)> deserialise, json& node)
+        : GroupProperty(node["name"], node["display"])
+    {
+        json& children = node["children"];
+        const size_t total = children.size();
+        childrenPointers_.resize(total);
+        children_.resize(total);
+        for (size_t i = 0; i < total; ++i) {
+            JSONNode child(children[i]);
+            children_[i] = deserialise(child);
+            childrenPointers_[i] = children_[i].get();
+        }
+    }
+
+    GroupPropertyIterator begin() const override { return GroupPropertyIterator{childrenPointers_.data(), 0, size()}; }
+    GroupPropertyIterator end() const override
+    {
+        return GroupPropertyIterator{childrenPointers_.data(), size(), size()};
+    }
+    size_t size() const override { return children_.size(); }
+
+private:
+    std::vector<const Property*> childrenPointers_;
+    std::vector<std::unique_ptr<Property>> children_;
+};
+
 class JSONGroupSerialiser : public JSONPropertySerialiser
 {
 public:
     using value_type = GroupProperty;
 
-    JSONGroupSerialiser(std::function<void(Node& node, const Property& prop)> serialiseChild)
-        : serialiseChild_{serialiseChild}
+    JSONGroupSerialiser(std::function<std::unique_ptr<Property>(Node& node)> deserialiseChild,
+                        std::function<void(Node& node, const Property& prop)> serialiseChild)
+        : deserialiseChild_{deserialiseChild}, serialiseChild_{serialiseChild}
     {
     }
 
     std::unique_ptr<Property> deserialise(Node& raw) override
     {
-        return std::unique_ptr<Property>();
+        JSONNode& node = raw.cast<JSONNode>();
+        return std::unique_ptr<JSONGroupProperty>(new JSONGroupProperty(deserialiseChild_, node.node_));
     }
 
     void serialiseInternals(JSONNode& node, const Property& prop) override
@@ -72,10 +104,12 @@ public:
         for (size_t i = 0; i < size; ++i) {
             JSONNode child(node.node_["children"][i]);
             serialiseChild_(child, *it);
+            ++it;
         }
     }
 
 private:
+    std::function<std::unique_ptr<Property>(Node& node)> deserialiseChild_;
     std::function<void(Node& node, const Property& prop)> serialiseChild_;
 };
 
