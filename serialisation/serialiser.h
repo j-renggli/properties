@@ -2,6 +2,7 @@
 
 #include "../basic_property.h"
 #include "../group_property.h"
+#include "../numeric_property.h"
 #include "../property.h"
 
 #include <map>
@@ -29,7 +30,7 @@ public:
     virtual void serialise(Node& node, const Property& prop) = 0;
 };
 
-template <class String, class Bool, class Group>
+template <class String, class Bool, class Int, class Double, class Group>
 struct Mapper {
     void fill(std::map<std::string, std::unique_ptr<PropertySerialiser>>& serialisers,
               std::function<std::unique_ptr<Property>(Node& node)> deserialiseChild,
@@ -37,6 +38,8 @@ struct Mapper {
     {
         map<String, StringProperty>(serialisers);
         map<Bool, BooleanProperty>(serialisers);
+        map<Int, IntProperty>(serialisers);
+        map<Double, DoubleProperty>(serialisers);
 
         // Group is special
         static_assert(std::is_same<typename Group::value_type, GroupProperty>::value,

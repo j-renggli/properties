@@ -49,6 +49,32 @@ public:
     }
 };
 
+template <class T>
+class JSONNumericSerialiser : public JSONPropertySerialiser
+{
+public:
+    using value_type = T;
+
+    std::unique_ptr<Property> deserialise(Node& raw) override
+    {
+        JSONNode& node = raw.cast<JSONNode>();
+        const typename T::value_type value = node.node_["value"];
+        const typename T::value_type min = node.node_["min"];
+        const typename T::value_type max = node.node_["max"];
+        return std::make_unique<T>(node.node_["name"], value, min, max, node.node_["display"]);
+    }
+
+    void serialiseInternals(JSONNode& node, const Property& prop) override
+    {
+        const T& numeric = prop.cast<value_type>();
+        node.node_["value"] = numeric.value();
+        if (numeric.min() != -value_type::max_value)
+            node.node_["min"] = numeric.min();
+        if (numeric.max() != value_type::max_value)
+            node.node_["max"] = numeric.max();
+    }
+};
+
 class JSONGroupProperty : public GroupProperty
 {
 public:
@@ -114,8 +140,11 @@ private:
 };
 
 JSONSerialiser::JSONSerialiser()
-    : Serialiser(
-          Mapper<JSONBasicSerialiser<StringProperty>, JSONBasicSerialiser<BooleanProperty>, JSONGroupSerialiser>())
+    : Serialiser(Mapper<JSONBasicSerialiser<StringProperty>,
+                        JSONBasicSerialiser<BooleanProperty>,
+                        JSONNumericSerialiser<IntProperty>,
+                        JSONNumericSerialiser<DoubleProperty>,
+                        JSONGroupSerialiser>())
 {
 }
 

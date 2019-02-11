@@ -51,13 +51,13 @@ public:
     }
     virtual ~Property() {}
 
-    operator std::string() const
+    explicit operator std::string() const
     {
         std::stringstream ss;
         str(ss);
         return ss.str();
     }
-    operator std::wstring() const
+    explicit operator std::wstring() const
     {
         std::wstringstream ss;
         str(ss);
