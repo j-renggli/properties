@@ -13,7 +13,7 @@ public:
     using value_type = T;
 
     /// Constructor for a basic property
-    BasicProperty(const std::string& name, const value_type& value, const std::string displayName = "")
+    BasicProperty(const std::string& name, const value_type& value, const std::string& displayName = "")
         : Property(name, displayName), value_{value}
     {
     }

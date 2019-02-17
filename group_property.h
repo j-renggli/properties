@@ -52,7 +52,7 @@ private:
 class PROPERTIES_EXPORT GroupProperty : public Property
 {
 public:
-    GroupProperty(const std::string& name, const std::string displayName = "") : Property(name, displayName) {}
+    GroupProperty(const std::string& name, const std::string& displayName = "") : Property(name, displayName) {}
     ~GroupProperty() override {}
 
     STR(out << "="; stream::convert(out, identifier) << "["; auto it = begin(); if (it != end()) it->str(out);

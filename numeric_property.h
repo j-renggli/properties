@@ -21,7 +21,7 @@ public:
                     const value_type& value,
                     const value_type& min = value_type(-max_value),
                     const value_type& max = value_type(max_value),
-                    const std::string displayName = "")
+                    const std::string& displayName = "")
         : Property(name, displayName), value_{value}, min_{min}, max_{max}
     {
         if (min_ > max_) {

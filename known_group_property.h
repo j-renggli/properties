@@ -10,7 +10,7 @@ class KnownGroupProperty : public GroupProperty
 {
 public:
     using Children = std::array<const Property*, N>;
-    KnownGroupProperty(const std::string& name, const Children& children, const std::string displayName = "")
+    KnownGroupProperty(const std::string& name, const Children& children, const std::string& displayName = "")
         : GroupProperty(name, displayName), children_{children}
     {
     }
