@@ -34,6 +34,9 @@ set(src
     numeric_property.cpp
     numeric_property.h
 
+    quantities/time_property.cpp
+    quantities/time_property.h
+
     serialisation/json_serialiser.cpp
     serialisation/json_serialiser.h
     serialisation/serialiser.cpp
